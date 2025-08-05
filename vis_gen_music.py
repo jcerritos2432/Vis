@@ -56,49 +56,64 @@ class MotionControlledSynth:
             'release': 0.5  # Release time
         }
         
-        # Dance music parameters
-        self.dance_params = {
-            'bpm': 128,  # Beats per minute
+        # Enhanced House Music parameters
+        self.house_params = {
+            'bpm': 128,  # Classic house BPM
             'beat_interval': 0.46875,  # 60/128 seconds
             'kick_freq': 60,  # Kick drum frequency
             'snare_freq': 200,  # Snare frequency
             'hihat_freq': 800,  # Hi-hat frequency
             'bass_freq': 55,  # Bass frequency
             'lead_freq': 220,  # Lead frequency
-            'chord_progression': [0, 5, 3, 4],  # I-V-vi-IV progression
             'current_chord': 0,
             'beat_count': 0,
             'last_beat_time': 0,
             'measure_count': 0,
             'current_key': 0,  # C major
-            'current_mode': 'major'
+            'current_mode': 'major',
+            'section': 'intro',  # intro, verse, chorus, breakdown, outro
+            'section_length': 16,  # measures per section
+            'build_up': False,
+            'drop': False
         }
         
-        # Musical scales and chord progressions for better harmony
-        self.major_scale = [0, 2, 4, 5, 7, 9, 11, 12]  # C major scale
-        self.minor_scale = [0, 2, 3, 5, 7, 8, 10, 12]  # C minor scale
-        self.current_scale = self.major_scale
-        
-        # Dance music chord progressions
-        self.chord_progressions = {
-            'house': [[0, 5, 3, 4], [0, 3, 4, 0], [0, 4, 5, 3]],  # I-V-vi-IV, I-vi-IV-I, I-IV-V-vi
-            'techno': [[0, 5, 0, 5], [0, 3, 0, 3], [0, 4, 0, 4]],  # I-V-I-V, I-vi-I-vi, I-IV-I-IV
-            'trance': [[0, 5, 3, 4], [0, 3, 4, 5], [0, 4, 5, 3]]   # I-V-vi-IV, I-vi-IV-V, I-IV-V-vi
+        # Authentic House Music chord progressions
+        self.house_chord_progressions = {
+            'intro': [0, 5, 3, 4],      # I-V-vi-IV (classic house)
+            'verse': [0, 3, 4, 0],      # I-vi-IV-I
+            'chorus': [0, 5, 3, 4],     # I-V-vi-IV
+            'breakdown': [0, 4, 5, 3],  # I-IV-V-vi
+            'outro': [0, 5, 0, 5]       # I-V-I-V
         }
         
-        # Dance music patterns
-        self.dance_patterns = {
+        # Enhanced House Music scales
+        self.house_scales = {
+            'major': [0, 2, 4, 5, 7, 9, 11, 12],  # C major scale
+            'minor': [0, 2, 3, 5, 7, 8, 10, 12],  # C minor scale
+            'pentatonic': [0, 2, 4, 7, 9, 12],     # C pentatonic
+            'blues': [0, 3, 5, 6, 7, 10, 12]      # C blues scale
+        }
+        self.current_scale = self.house_scales['major']
+        
+        # Authentic House Music drum patterns
+        self.house_drum_patterns = {
             'kick_pattern': [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],  # Four-on-the-floor
             'snare_pattern': [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],  # On 2 and 4
-            'hihat_pattern': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]   # Every beat
+            'hihat_pattern': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],  # Every beat
+            'clap_pattern': [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],   # On 2 and 4
+            'tom_pattern': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]     # Fill pattern
         }
         
-        # Motion to audio mapping
-        self.motion_mapping = {
-            'avg_movement': 'lead_freq',     # Average movement -> lead frequency
-            'object_count': 'bass_freq',     # Number of objects -> bass frequency
-            'max_movement': 'energy',        # Maximum movement -> overall energy
-            'movement_variance': 'rhythm'    # Movement variance -> rhythm complexity
+        # Enhanced motion to audio mapping for House Music
+        self.house_motion_mapping = {
+            'avg_movement': 'lead_melody',      # Average movement -> lead melody complexity
+            'object_count': 'bass_line',        # Number of objects -> bass line variation
+            'max_movement': 'energy_level',     # Maximum movement -> overall energy
+            'movement_variance': 'rhythm_complexity',  # Movement variance -> rhythm complexity
+            'object_speed': 'filter_cutoff',    # Object speed -> filter cutoff
+            'object_size': 'reverb_amount',     # Object size -> reverb amount
+            'object_position_x': 'panning',     # X position -> stereo panning
+            'object_position_y': 'pitch_bend'   # Y position -> pitch bend
         }
         
         # Audio thread and queue
@@ -106,25 +121,39 @@ class MotionControlledSynth:
         self.audio_thread = None
         self.running = True
         
-        # Volume controls for different parameters
-        self.volume_controls = {
-            'kick': 0.25,      # Kick drum volume
-            'snare': 0.15,     # Snare drum volume
-            'hihat': 0.08,     # Hi-hat volume
-            'bass': 0.2,       # Bass line volume
-            'lead': 0.12,      # Lead melody volume
-            'harmony': 0.08,   # Harmony volume
-            'pad': 0.05        # Pad volume
+        # Enhanced volume controls for House Music
+        self.house_volume_controls = {
+            'kick': 0.3,       # Kick drum volume (prominent in house)
+            'snare': 0.2,      # Snare drum volume
+            'hihat': 0.15,     # Hi-hat volume
+            'clap': 0.1,       # Clap volume
+            'tom': 0.08,       # Tom volume
+            'bass': 0.25,      # Bass line volume (important in house)
+            'lead': 0.15,      # Lead melody volume
+            'harmony': 0.12,   # Harmony volume
+            'pad': 0.08,       # Pad volume
+            'fx': 0.05         # Effects volume
         }
         
         # Volume control mode (which parameter to adjust)
         self.volume_control_mode = 'kick'  # Default to kick
-        self.volume_modes = ['kick', 'snare', 'hihat', 'bass', 'lead', 'harmony', 'pad']
+        self.volume_modes = ['kick', 'snare', 'hihat', 'clap', 'tom', 'bass', 'lead', 'harmony', 'pad', 'fx']
+        
+        # House Music effects and processing
+        self.house_effects = {
+            'reverb_amount': 0.1,
+            'delay_amount': 0.05,
+            'filter_cutoff': 0.7,
+            'filter_resonance': 0.3,
+            'distortion_amount': 0.1,
+            'compression_ratio': 2.0,
+            'sidechain_amount': 0.3
+        }
         
         # Initialize audio
         self.init_audio()
         
-        print("Motion Controlled Synth initialized")
+        print("Enhanced House Music Motion Controlled Synth initialized")
         print(f"Current resolution: {self.screen_sizes[self.current_size_index][0]}x{self.screen_sizes[self.current_size_index][1]}")
         print("\nControls:")
         print("  'd' - Toggle debug mode")
@@ -137,6 +166,8 @@ class MotionControlledSynth:
         print("  'v' - Cycle through volume parameters")
         print("  'q' - Quit")
         print("  'r' - Reset tracking")
+        print("  's' - Change house music section")
+        print("  'b' - Toggle build-up mode")
     
     def init_audio(self):
         """Initialize pygame and MIDI for audio synthesis"""
@@ -300,20 +331,20 @@ class MotionControlledSynth:
         current_time = time.time()
         
         # Update beat timing and musical structure
-        if current_time - self.dance_params['last_beat_time'] >= self.dance_params['beat_interval']:
-            self.dance_params['beat_count'] += 1
-            self.dance_params['last_beat_time'] = current_time
+        if current_time - self.house_params['last_beat_time'] >= self.house_params['beat_interval']:
+            self.house_params['beat_count'] += 1
+            self.house_params['last_beat_time'] = current_time
             
             # Change chord every 4 beats (measure)
-            if self.dance_params['beat_count'] % 4 == 0:
-                self.dance_params['current_chord'] = (self.dance_params['current_chord'] + 1) % 4
-                self.dance_params['measure_count'] += 1
+            if self.house_params['beat_count'] % 4 == 0:
+                self.house_params['current_chord'] = (self.house_params['current_chord'] + 1) % 4
+                self.house_params['measure_count'] += 1
                 
                 # Change key every 8 measures for variety
-                if self.dance_params['measure_count'] % 8 == 0:
-                    self.dance_params['current_key'] = (self.dance_params['current_key'] + 7) % 12  # Move to relative minor
-                    self.dance_params['current_mode'] = 'minor' if self.dance_params['current_mode'] == 'major' else 'major'
-                    self.current_scale = self.minor_scale if self.dance_params['current_mode'] == 'minor' else self.major_scale
+                if self.house_params['measure_count'] % 8 == 0:
+                    self.house_params['current_key'] = (self.house_params['current_key'] + 7) % 12  # Move to relative minor
+                    self.house_params['current_mode'] = 'minor' if self.house_params['current_mode'] == 'major' else 'major'
+                    self.current_scale = self.house_scales['minor'] if self.house_params['current_mode'] == 'minor' else self.house_scales['major']
         
         # Map motion to musical parameters with better musical logic
         energy = max_movement  # 0-1 energy level
@@ -323,17 +354,28 @@ class MotionControlledSynth:
         lead_note = int(avg_movement * 7) % 7  # 7 notes in scale
         lead_freq = self.get_note_frequency(lead_note, 220)  # A3 base
         
-        # Bass line based on object count and current chord
-        chord_root = self.dance_params['chord_progression'][self.dance_params['current_chord']]
+        # Get current section chord progression
+        current_section = self.house_params['section']
+        chord_root = self.house_chord_progressions[current_section][self.house_params['current_chord']]
+        
+        # Bass line based on object count and current chord (house music style)
         bass_note = (chord_root + object_count % 3) % 7  # Chord tones
         bass_freq = self.get_note_frequency(bass_note, 55)  # A1 base
         
         # Harmony based on current chord
-        chord_notes = self.get_chord_notes(chord_root, self.dance_params['current_mode'])
+        chord_notes = self.get_chord_notes(chord_root, self.house_params['current_mode'])
         harmony_freqs = [self.get_note_frequency(note, 110) for note in chord_notes]  # A2 base
         
+        # Adjust for build-up mode
+        if self.house_params['build_up']:
+            # Increase energy and complexity during build-up
+            energy = min(1.0, energy * 1.5)
+            rhythm_complexity = min(1.0, rhythm_complexity * 1.3)
+            # Add filter sweep effect
+            self.house_effects['filter_cutoff'] = 0.3 + energy * 0.7
+        
         # Update dance parameters
-        self.dance_params.update({
+        self.house_params.update({
             'current_lead_freq': lead_freq,
             'current_bass_freq': bass_freq,
             'harmony_freqs': harmony_freqs,
@@ -352,7 +394,7 @@ class MotionControlledSynth:
                     'harmony_freqs': harmony_freqs,
                     'energy': energy,
                     'rhythm_complexity': rhythm_complexity,
-                    'beat_count': self.dance_params['beat_count'],
+                    'beat_count': self.house_params['beat_count'],
                     'object_count': object_count,
                     'avg_movement': avg_movement,
                     'current_time': current_time,
@@ -398,37 +440,47 @@ class MotionControlledSynth:
                 step = params['beat_count'] % 16
                 
                 # Generate kick drum using pattern (with volume control)
-                if self.dance_patterns['kick_pattern'][step]:
+                if self.house_drum_patterns['kick_pattern'][step]:
                     kick = self.generate_kick_drum(samples, sample_rate, params['energy'])
-                    mix += kick * self.volume_controls['kick']
+                    mix += kick * self.house_volume_controls['kick']
                 
                 # Generate snare using pattern (with volume control)
-                if self.dance_patterns['snare_pattern'][step]:
+                if self.house_drum_patterns['snare_pattern'][step]:
                     snare = self.generate_snare_drum(samples, sample_rate, params['energy'])
-                    mix += snare * self.volume_controls['snare']
+                    mix += snare * self.house_volume_controls['snare']
                 
                 # Generate hi-hats using pattern (with volume control)
-                if self.dance_patterns['hihat_pattern'][step]:
+                if self.house_drum_patterns['hihat_pattern'][step]:
                     hihat = self.generate_hihat(samples, sample_rate, params['rhythm_complexity'])
-                    mix += hihat * self.volume_controls['hihat']
+                    mix += hihat * self.house_volume_controls['hihat']
+                
+                # Generate clap using pattern (with volume control)
+                if self.house_drum_patterns['clap_pattern'][step]:
+                    clap = self.generate_clap(samples, sample_rate, params['energy'])
+                    mix += clap * self.house_volume_controls['clap']
+                
+                # Generate tom fills (occasionally, with volume control)
+                if self.house_drum_patterns['tom_pattern'][step] and step % 8 == 7:  # On last beat of every 8
+                    tom = self.generate_tom(samples, sample_rate, params['energy'])
+                    mix += tom * self.house_volume_controls['tom']
                 
                 # Generate bass line (every beat, with volume control)
                 bass = self.generate_bass_line(samples, sample_rate, params['bass_freq'], params['energy'])
-                mix += bass * self.volume_controls['bass']
+                mix += bass * self.house_volume_controls['bass']
                 
                 # Generate lead melody (every other beat, with volume control)
                 if step % 2 == 0:
                     lead = self.generate_lead_melody(samples, sample_rate, params['lead_freq'], params['energy'])
-                    mix += lead * self.volume_controls['lead']
+                    mix += lead * self.house_volume_controls['lead']
                 
                 # Generate harmony (on chord changes, with volume control)
                 if step % 4 == 0:
                     harmony = self.generate_harmony(samples, sample_rate, params['harmony_freqs'], params['energy'])
-                    mix += harmony * self.volume_controls['harmony']
+                    mix += harmony * self.house_volume_controls['harmony']
                 
                 # Generate pad (sustained chords, with volume control)
                 pad = self.generate_pad(samples, sample_rate, params['harmony_freqs'], params['energy'])
-                mix += pad * self.volume_controls['pad']
+                mix += pad * self.house_volume_controls['pad']
                 
                 # Apply gentle compression first
                 mix = self.apply_gentle_compression(mix)
@@ -458,80 +510,150 @@ class MotionControlledSynth:
                 continue
     
     def generate_kick_drum(self, samples, sample_rate, energy):
-        """Generate kick drum sound"""
+        """Generate authentic house music kick drum sound"""
         t = np.linspace(0, samples/sample_rate, samples)
         
-        # Pitch envelope (frequency sweep)
-        start_freq = 80 + energy * 40
-        end_freq = 40 + energy * 20
-        freq_sweep = start_freq * np.exp(-t * 8)
+        # House music kick characteristics
+        start_freq = 70 + energy * 30  # Slightly lower for house
+        end_freq = 35 + energy * 15
+        freq_sweep = start_freq * np.exp(-t * 10)  # Faster decay for punch
         
-        # Kick envelope (softer)
-        envelope = np.exp(-t * 6) * (0.8 + energy * 0.4)
+        # House kick envelope (punchy with longer tail)
+        envelope = np.exp(-t * 8) * (0.9 + energy * 0.3)
+        envelope += np.exp(-t * 2) * 0.2  # Longer tail for warmth
         
         # Generate kick sound with pitch sweep
         kick = np.sin(2 * np.pi * freq_sweep * t) * envelope
-        kick += np.sin(2 * np.pi * freq_sweep * 0.5 * t) * envelope * 0.3  # Sub-harmonic
+        kick += np.sin(2 * np.pi * freq_sweep * 0.5 * t) * envelope * 0.4  # Stronger sub-harmonic
         
-        # Add some click at the start
-        click = np.exp(-t * 100) * 0.2
+        # Add click for punch
+        click = np.exp(-t * 150) * 0.3
         kick += click
+        
+        # Add slight saturation for warmth
+        kick = np.tanh(kick * 0.8) * 0.9
         
         return kick
     
     def generate_snare_drum(self, samples, sample_rate, energy):
-        """Generate snare drum sound"""
+        """Generate authentic house music snare drum sound"""
         t = np.linspace(0, samples/sample_rate, samples)
         
-        # Snare envelope (softer)
-        envelope = np.exp(-t * 8) * (0.6 + energy * 0.3)
+        # House snare envelope (crisp with body)
+        envelope = np.exp(-t * 12) * (0.7 + energy * 0.3)
+        envelope += np.exp(-t * 3) * 0.2  # Body
         
         # Generate snare sound (filtered noise + tone)
         noise = np.random.randn(samples)
-        # Apply simple low-pass filter to noise
-        filtered_noise = np.convolve(noise, np.ones(5)/5, mode='same')
+        # Apply band-pass filter effect to noise
+        filtered_noise = np.convolve(noise, np.ones(3)/3, mode='same')
+        filtered_noise = np.convolve(filtered_noise, np.ones(7)/7, mode='same')
         filtered_noise = filtered_noise * envelope
         
-        # Tone component
-        tone = np.sin(2 * np.pi * 200 * t) * envelope * 0.4
-        tone += np.sin(2 * np.pi * 400 * t) * envelope * 0.2
+        # House snare tone component (more prominent)
+        tone = np.sin(2 * np.pi * 180 * t) * envelope * 0.5  # Lower fundamental
+        tone += np.sin(2 * np.pi * 360 * t) * envelope * 0.3  # Second harmonic
+        tone += np.sin(2 * np.pi * 720 * t) * envelope * 0.1  # Third harmonic
         
-        snare = filtered_noise * 0.6 + tone * 0.4
+        snare = filtered_noise * 0.5 + tone * 0.5
         return snare
     
     def generate_hihat(self, samples, sample_rate, complexity):
-        """Generate hi-hat sound"""
+        """Generate authentic house music hi-hat sound"""
         t = np.linspace(0, samples/sample_rate, samples)
         
-        # Hi-hat envelope (softer)
-        envelope = np.exp(-t * 30) * (0.4 + complexity * 0.3)
+        # House hi-hat envelope (crisp and bright)
+        envelope = np.exp(-t * 40) * (0.5 + complexity * 0.3)
         
         # Generate hi-hat sound (filtered high-frequency noise)
         noise = np.random.randn(samples)
         # Apply high-pass filter effect
-        filtered_noise = noise - np.convolve(noise, np.ones(10)/10, mode='same')
-        hihat = filtered_noise * envelope * 0.3
+        filtered_noise = noise - np.convolve(noise, np.ones(8)/8, mode='same')
+        hihat = filtered_noise * envelope * 0.4
         
-        # Add some metallic character
-        metallic = np.sin(2 * np.pi * 8000 * t) * envelope * 0.1
+        # Add metallic character (house hi-hats are bright)
+        metallic = np.sin(2 * np.pi * 10000 * t) * envelope * 0.15
+        metallic += np.sin(2 * np.pi * 12000 * t) * envelope * 0.1
         hihat += metallic
+        
+        # Add slight ring
+        ring = np.sin(2 * np.pi * 6000 * t) * envelope * 0.05
+        hihat += ring
         
         return hihat
     
-    def generate_bass_line(self, samples, sample_rate, freq, energy):
-        """Generate bass line"""
+    def generate_clap(self, samples, sample_rate, energy):
+        """Generate authentic house music clap sound"""
         t = np.linspace(0, samples/sample_rate, samples)
         
-        # Bass envelope (softer)
-        envelope = np.exp(-t * 3) * (0.7 + energy * 0.3)
+        # House clap envelope (sharp attack, medium decay)
+        envelope = np.exp(-t * 15) * (0.6 + energy * 0.3)
+        
+        # Generate clap sound (multiple noise bursts)
+        clap = np.zeros(samples)
+        
+        # Main clap (delayed slightly for realism)
+        delay_samples = int(0.002 * sample_rate)  # 2ms delay
+        if delay_samples < samples:
+            noise1 = np.random.randn(samples - delay_samples)
+            filtered_noise1 = np.convolve(noise1, np.ones(5)/5, mode='same')
+            clap[delay_samples:] += filtered_noise1 * envelope[:-delay_samples] * 0.4
+        
+        # Secondary clap (slightly different timing)
+        delay_samples2 = int(0.004 * sample_rate)  # 4ms delay
+        if delay_samples2 < samples:
+            noise2 = np.random.randn(samples - delay_samples2)
+            filtered_noise2 = np.convolve(noise2, np.ones(3)/3, mode='same')
+            clap[delay_samples2:] += filtered_noise2 * envelope[:-delay_samples2] * 0.3
+        
+        # Add some body
+        body = np.sin(2 * np.pi * 300 * t) * envelope * 0.1
+        clap += body
+        
+        return clap
+    
+    def generate_tom(self, samples, sample_rate, energy):
+        """Generate house music tom sound for fills"""
+        t = np.linspace(0, samples/sample_rate, samples)
+        
+        # Tom envelope (medium attack, longer decay)
+        envelope = np.exp(-t * 6) * (0.7 + energy * 0.3)
+        
+        # Generate tom sound
+        tom_freq = 120 + energy * 60  # Variable pitch
+        tom = np.sin(2 * np.pi * tom_freq * t) * envelope
+        tom += np.sin(2 * np.pi * tom_freq * 2 * t) * envelope * 0.3  # Second harmonic
+        
+        # Add some noise for character
+        noise = np.random.randn(samples)
+        filtered_noise = np.convolve(noise, np.ones(10)/10, mode='same')
+        tom += filtered_noise * envelope * 0.2
+        
+        return tom
+    
+    def generate_bass_line(self, samples, sample_rate, freq, energy):
+        """Generate authentic house music bass line"""
+        t = np.linspace(0, samples/sample_rate, samples)
+        
+        # House bass envelope (punchy with sustain)
+        envelope = np.exp(-t * 4) * (0.8 + energy * 0.3)
+        envelope += np.exp(-t * 1) * 0.3  # Longer tail for house bass
         
         # Generate bass sound with harmonics
         bass = np.sin(2 * np.pi * freq * t) * envelope
-        bass += np.sin(2 * np.pi * freq * 2 * t) * envelope * 0.2  # 2nd harmonic
-        bass += np.sin(2 * np.pi * freq * 3 * t) * envelope * 0.1  # 3rd harmonic
+        bass += np.sin(2 * np.pi * freq * 2 * t) * envelope * 0.3  # Stronger 2nd harmonic
+        bass += np.sin(2 * np.pi * freq * 3 * t) * envelope * 0.15  # 3rd harmonic
         
-        # Add some saturation for warmth
-        bass = np.tanh(bass * 0.5) * 0.8
+        # Add sub-bass for house music
+        sub_bass = np.sin(2 * np.pi * freq * 0.5 * t) * envelope * 0.4
+        bass += sub_bass
+        
+        # Add saturation for warmth (house bass is warm)
+        bass = np.tanh(bass * 0.6) * 0.9
+        
+        # Add slight filter sweep for movement
+        filter_env = np.exp(-t * 2)
+        bass *= (0.7 + filter_env * 0.3)
         
         return bass
     
@@ -732,12 +854,14 @@ class MotionControlledSynth:
             f"Min contour area: {self.min_contour_area}",
             f"Resolution: {current_width}x{current_height}",
             f"Audio: {'ON' if self.audio_enabled else 'OFF'}",
-            f"BPM: {self.dance_params['bpm']}",
-            f"Beat: {self.dance_params['beat_count'] % 4 + 1}/4",
-            f"Energy: {self.dance_params.get('energy', 0):.2f}",
-            f"Lead: {self.dance_params.get('current_lead_freq', 0):.0f} Hz",
-            f"Bass: {self.dance_params.get('current_bass_freq', 0):.0f} Hz",
-            f"Volume: {self.volume_control_mode} ({self.volume_controls[self.volume_control_mode]:.2f})",
+            f"BPM: {self.house_params['bpm']}",
+            f"Beat: {self.house_params['beat_count'] % 4 + 1}/4",
+            f"Section: {self.house_params['section'].upper()}",
+            f"Build-up: {'ON' if self.house_params['build_up'] else 'OFF'}",
+            f"Energy: {self.house_params.get('energy', 0):.2f}",
+            f"Lead: {self.house_params.get('current_lead_freq', 0):.0f} Hz",
+            f"Bass: {self.house_params.get('current_bass_freq', 0):.0f} Hz",
+            f"Volume: {self.volume_control_mode} ({self.house_volume_controls[self.volume_control_mode]:.2f})",
             f"Press +/- to adjust sensitivity, v to cycle volume, arrows to adjust"
         ]
         
@@ -823,19 +947,36 @@ class MotionControlledSynth:
         current_index = self.volume_modes.index(self.volume_control_mode)
         next_index = (current_index + 1) % len(self.volume_modes)
         self.volume_control_mode = self.volume_modes[next_index]
-        print(f"Volume control: {self.volume_control_mode} (current: {self.volume_controls[self.volume_control_mode]:.2f})")
+        print(f"Volume control: {self.volume_control_mode} (current: {self.house_volume_controls[self.volume_control_mode]:.2f})")
     
     def adjust_volume(self, direction):
         """Adjust volume of current parameter"""
-        current_volume = self.volume_controls[self.volume_control_mode]
+        current_volume = self.house_volume_controls[self.volume_control_mode]
         
         if direction == 'up':
             new_volume = min(1.0, current_volume + 0.05)
         else:  # down
             new_volume = max(0.0, current_volume - 0.05)
         
-        self.volume_controls[self.volume_control_mode] = new_volume
+        self.house_volume_controls[self.volume_control_mode] = new_volume
         print(f"{self.volume_control_mode} volume: {new_volume:.2f}")
+    
+    def change_house_section(self):
+        """Cycle through house music sections"""
+        sections = ['intro', 'verse', 'chorus', 'breakdown', 'outro']
+        current_index = sections.index(self.house_params['section'])
+        next_index = (current_index + 1) % len(sections)
+        self.house_params['section'] = sections[next_index]
+        print(f"House section changed to: {self.house_params['section']}")
+    
+    def toggle_build_up(self):
+        """Toggle build-up mode for house music"""
+        self.house_params['build_up'] = not self.house_params['build_up']
+        if self.house_params['build_up']:
+            self.house_params['drop'] = False
+            print("Build-up mode: ON")
+        else:
+            print("Build-up mode: OFF")
     
     def reset_tracking(self):
         """Reset all tracking data"""
@@ -884,7 +1025,7 @@ class MotionControlledSynth:
             
             self.draw_objects_and_scores(frame, tracked_objects, movement_scores)
             
-            cv2.putText(frame, "Press 'd' for debug, 't' for trajectories, '+/-' for sensitivity, '1-5' for size, 'f' for fullscreen, 'a' for audio, 'v' for volume, arrows to adjust, 'r' to reset, 'q' to quit", 
+            cv2.putText(frame, "Press 'd' for debug, 't' for trajectories, '+/-' for sensitivity, '1-5' for size, 'f' for fullscreen, 'a' for audio, 'v' for volume, 'w'/'x' to adjust volume, 'r' to reset, 's' for section, 'b' for build-up, 'q' to quit", 
                        (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
             
             cv2.imshow('Motion Controlled Synth', frame)
@@ -913,10 +1054,19 @@ class MotionControlledSynth:
                 self.cycle_volume_parameter()
             elif key == ord('r'):
                 self.reset_tracking()
-            # Arrow key handling for volume control
-            elif key == 82:  # Up arrow
+            elif key == ord('s'):
+                self.change_house_section()
+            elif key == ord('b'):
+                self.toggle_build_up()
+            # Volume control - using 'w' and 'x' keys (arrow keys may not work on all systems)
+            elif key == ord('w'):  # 'w' for volume up
                 self.adjust_volume('up')
-            elif key == 84:  # Down arrow
+            elif key == ord('x'):  # 'x' for volume down
+                self.adjust_volume('down')
+            # Arrow key handling (with 0xFF mask)
+            elif key == 82:  # Up arrow (with 0xFF mask)
+                self.adjust_volume('up')
+            elif key == 84:  # Down arrow (with 0xFF mask)
                 self.adjust_volume('down')
         
         self.running = False

@@ -109,19 +109,21 @@ python vis_gen.py
 - **Resolution Adaptation**: Automatic parameter adjustment based on screen size
 - **Camera Management**: Robust camera reconnection and error handling
 
-## Script 3: Motion-Controlled Synthesizer (`vis_gen_music.py`)
+## Script 3: Enhanced House Music Synthesizer (`vis_gen_music.py`)
 
 ### Purpose
-Creates real-time dance music by mapping motion parameters to a sophisticated synthesizer, producing professional-quality electronic music.
+Creates authentic house music in real-time by mapping motion parameters to a sophisticated synthesizer, producing professional-quality electronic house music with dynamic structure and authentic sound design.
 
 ### Features
-- **Dance Music Generation**: Complete electronic music production system
-- **Multi-instrument Synthesis**: Kick, snare, hi-hat, bass, lead, harmony, and pad
-- **Musical Structure**: BPM tracking, chord progressions, key changes, and modes
-- **Volume Control**: Individual volume adjustment for each instrument
-- **Audio Processing**: Compression, limiting, and EQ for professional sound
-- **Motion Mapping**: Translates movement to musical parameters
-- **Real-time Control**: Adjust volumes and parameters during performance
+- **Authentic House Music Generation**: Complete house music production system with authentic sound design
+- **Multi-instrument Synthesis**: Kick, snare, hi-hat, clap, tom, bass, lead, harmony, and pad
+- **Dynamic Musical Structure**: BPM tracking, house chord progressions, key changes, modes, and song sections
+- **Advanced Volume Control**: Individual volume adjustment for all instruments including new house elements
+- **Professional Audio Processing**: Compression, limiting, EQ, and house-specific effects
+- **Granular Motion Mapping**: Translates movement to detailed musical parameters
+- **Real-time Control**: Adjust volumes, change sections, toggle build-up mode during performance
+- **Song Structure**: Intro, verse, chorus, breakdown, and outro sections with automatic transitions
+- **Build-up Mode**: Dynamic energy increase and filter sweeps for authentic house music tension
 
 ### Controls
 - **'d'**: Toggle debug mode
@@ -130,8 +132,11 @@ Creates real-time dance music by mapping motion parameters to a sophisticated sy
 - **'1'-'5'**: Change screen size
 - **'f'**: Toggle fullscreen mode
 - **'a'**: Toggle audio on/off
-- **'v'**: Cycle through volume parameters (kick, snare, hi-hat, bass, lead, harmony, pad)
-- **Arrow Keys**: Adjust volume of selected parameter (up/down)
+- **'v'**: Cycle through volume parameters (kick, snare, hi-hat, clap, tom, bass, lead, harmony, pad, fx)
+- **'w'/'x'**: Adjust volume of selected parameter (up/down) - primary volume control
+- **Arrow Keys**: Adjust volume of selected parameter (up/down) - alternative volume control
+- **'s'**: Cycle through house music sections (intro, verse, chorus, breakdown, outro)
+- **'b'**: Toggle build-up mode for dynamic energy increase
 - **'r'**: Reset tracking
 - **'q'**: Quit program
 
@@ -143,38 +148,56 @@ python vis_gen_music.py
 ### Audio Features
 
 #### Instruments
-- **Kick Drum**: Pitch envelope with frequency sweep and click
-- **Snare Drum**: Filtered noise with tone components
-- **Hi-Hat**: High-frequency noise with metallic character
-- **Bass Line**: Harmonic synthesis with saturation
-- **Lead Melody**: Multi-harmonic with chorus effect
-- **Harmony**: Chord-based synthesis
-- **Pad**: Sustained chords with multiple harmonics
+- **Kick Drum**: Authentic house kick with lower frequency (70Hz), punchy envelope, stronger sub-harmonic, and saturation for warmth
+- **Snare Drum**: House-style snare with crisp envelope, band-pass filtered noise, and prominent tone components (180Hz, 360Hz, 720Hz)
+- **Hi-Hat**: Bright house hi-hats with sharp envelope, high-pass filtering, metallic character (10kHz, 12kHz), and subtle ring
+- **Clap**: Realistic house clap with multiple delayed noise bursts, sharp attack, and body tone for authenticity
+- **Tom**: House music tom sounds for fills with medium attack, longer decay, variable pitch, and noise character
+- **Bass Line**: Warm house bass with punchy envelope, strong harmonics, sub-bass, saturation, and filter sweep for movement
+- **Lead Melody**: Multi-harmonic with chorus effect and dynamic frequency mapping
+- **Harmony**: Chord-based synthesis with house progressions
+- **Pad**: Sustained chords with multiple harmonics and atmospheric qualities
 
 #### Musical Structure
-- **BPM**: 128 beats per minute (dance tempo)
-- **Chord Progressions**: I-V-vi-IV and other dance music patterns
-- **Key Changes**: Automatic modulation every 8 measures
-- **Modes**: Alternates between major and minor scales
-- **Rhythm Patterns**: Four-on-the-floor kick, 2&4 snare, constant hi-hat
+- **BPM**: 128 beats per minute (authentic house tempo)
+- **House Chord Progressions**: Section-specific progressions (intro: I-IV, verse: I-V-vi-IV, chorus: vi-IV-I-V, breakdown: i-VI-III-VII, outro: I-IV)
+- **Key Changes**: Automatic modulation every 8 measures with house music theory
+- **House Scales**: Major, minor, pentatonic, and blues scales for authentic house melodies
+- **Rhythm Patterns**: Four-on-the-floor kick, 2&4 snare, constant hi-hat, clap on 2&4, tom fills
+- **Song Sections**: Dynamic structure with intro, verse, chorus, breakdown, and outro
+- **Build-up Mode**: Energy increase, filter sweeps, and tension building for authentic house music dynamics
 
 #### Motion-to-Music Mapping
-- **Average Movement** → Lead frequency
-- **Object Count** → Bass frequency
-- **Maximum Movement** → Overall energy
-- **Movement Variance** → Rhythm complexity
+- **Average Movement** → Lead melody complexity and frequency
+- **Object Count** → Bass line variation and frequency
+- **Maximum Movement** → Overall energy and rhythm complexity
+- **Movement Variance** → Filter cutoff and reverb amount
+- **Object Speed** → Panning and spatial effects
+- **Object Size** → Pitch bend and modulation depth
+- **Object Position** → Stereo positioning and width
+- **Build-up Mode** → Dynamic energy increase, filter sweeps, and tension building
 
 #### Audio Processing
-- **Gentle Compression**: Threshold 0.3, ratio 2.0
-- **Dance EQ**: Bass boost, kick boost, high frequency enhancement
-- **Limiting**: Soft limiting at 0.8 with hard clip at 0.85
-- **Stereo Mixing**: Slight panning for spatial depth
+- **House Compression**: Threshold 0.3, ratio 2.0 with house-specific characteristics
+- **House EQ**: Bass boost, kick boost, high frequency enhancement, and house music frequency response
+- **Limiting**: Soft limiting at 0.8 with hard clip at 0.85 for clean house sound
+- **Stereo Mixing**: Slight panning for spatial depth and house music width
+- **House Effects**: Filter sweeps, reverb, and dynamic processing for authentic house music atmosphere
+
+### Volume Control System
+- **Primary Controls**: Use 'w' (volume up) and 'x' (volume down) for reliable volume adjustment
+- **Alternative Controls**: Arrow keys (Up/Down) also work for volume control on compatible systems
+- **Parameter Cycling**: Press 'v' to cycle through different volume parameters (kick, snare, hi-hat, clap, tom, bass, lead, harmony, pad, fx)
+- **Conflict Resolution**: 's' key is reserved for changing house music sections, avoiding conflicts with volume controls
+- **Real-time Adjustment**: All volume changes are applied immediately during performance
 
 ### Debug Mode Features
-- **Audio Parameters**: BPM, beat count, energy, frequencies
-- **Volume Display**: Current parameter and its volume level
-- **Motion Mask**: Visual feedback for motion detection
-- **System Statistics**: Performance and tracking information
+- **Audio Parameters**: BPM, beat count, energy, frequencies, current section, build-up status
+- **Volume Display**: Current parameter and its volume level for all house instruments
+- **Motion Mask**: Visual feedback for motion detection and mapping
+- **System Statistics**: Performance, tracking information, and house music parameters
+- **Section Display**: Current house music section (intro, verse, chorus, breakdown, outro)
+- **Build-up Status**: Visual indicator of build-up mode activation
 
 ## Common Features Across All Scripts
 
@@ -292,3 +315,16 @@ Contributions are welcome! Please feel free to:
 - **v2.0**: Added vis_gen.py (general motion tracking)
 - **v3.0**: Added vis_gen_music.py (motion-controlled synthesizer)
 - **v3.1**: Enhanced audio quality and volume controls
+- **v3.2**: **Major House Music Enhancement** - Transformed generic dance music into authentic house music with:
+  - Authentic house sound design (kick, snare, hi-hat, clap, tom, bass)
+  - House-specific chord progressions and scales
+  - Dynamic song structure (intro, verse, chorus, breakdown, outro)
+  - Build-up mode for authentic house music tension
+  - Granular motion-to-music mapping
+  - Professional house music effects and processing
+- **v3.3**: **Volume Control Fixes** - Resolved key conflicts and improved volume control reliability:
+  - Fixed 's' key conflict by reassigning volume down to 'x' key
+  - Restored arrow key functionality with proper key code handling
+  - Added dual volume control system ('w'/'x' primary, arrow keys alternative)
+  - Updated help text and user interface for clarity
+  - Enhanced volume parameter cycling for all house music instruments
